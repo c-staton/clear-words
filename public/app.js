@@ -333,7 +333,7 @@
 
     content.innerHTML = `
       <p class="question">What would you like to accomplish with AI?</p>
-      <p class="lead">Let's start your prompt. Say it in your own words — simple or detailed is fine.</p>
+      <p class="lead">Let's start your prompt. Say it in your own words. Simple or detailed is fine.</p>
       <div class="paste-box gate-compose">
         <textarea class="text-area gate-input" id="gateAnswer" maxlength="${PASTE_TEXT_MAX}" rows="6"
           placeholder="Type or paste anything. Messy is fine."></textarea>
