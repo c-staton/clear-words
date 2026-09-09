@@ -5,6 +5,9 @@
   const dots = document.getElementById('dots');
   const progressLabel = document.getElementById('progressLabel');
   const restartBtn = document.getElementById('restartBtn');
+  const buildMeter = document.getElementById('buildMeter');
+  const buildMeterFill = document.getElementById('buildMeterFill');
+  const buildMeterLabel = document.getElementById('buildMeterLabel');
 
   const THINKING_WORDS = ['One sec...', 'Putting this together...', 'Got it...'];
   const MAX_DOTS = 7;
@@ -193,10 +196,61 @@
   }
 
   function setProgress(_n, _almost) {
-    // Dynamic question count - never show 1-of-N / wizard chrome.
+    // Old wizard chrome stays off. Prompt power meter is separate.
     if (progress) progress.hidden = true;
     if (progressLabel) progressLabel.textContent = '';
     if (dots) dots.innerHTML = '';
+  }
+
+  const METER_WORDS = [
+    'Getting started',
+    'Warming up',
+    'Taking shape',
+    'Getting clearer',
+    'Almost there',
+    'Looking strong',
+    'Ready to paste',
+  ];
+
+  function meterPercent(answerCount, done) {
+    if (done) return 100;
+    // Game-y curve: first answer jumps, then climbs toward ~90 before done.
+    const n = Math.max(0, Number(answerCount) || 0);
+    if (n <= 0) return 8;
+    const pct = Math.min(92, 18 + n * 14 + Math.min(n, 3) * 4);
+    return pct;
+  }
+
+  function setBuildMeter(answerCount, opts) {
+    const done = Boolean(opts && opts.done);
+    const hidden = Boolean(opts && opts.hidden);
+    if (!buildMeter || !buildMeterFill) return;
+    if (hidden) {
+      buildMeter.hidden = true;
+      buildMeter.classList.remove('is-pulse', 'is-max');
+      return;
+    }
+    const pct = meterPercent(answerCount, done);
+    const prev = Number(buildMeter.dataset.pct || 0);
+    buildMeter.hidden = false;
+    buildMeter.dataset.pct = String(pct);
+    buildMeterFill.style.width = pct + '%';
+    buildMeter.setAttribute('aria-valuenow', String(pct));
+    if (buildMeterLabel) {
+      const idx = done ? METER_WORDS.length - 1 : Math.min(METER_WORDS.length - 2, Math.floor(pct / 16));
+      buildMeterLabel.textContent = METER_WORDS[idx];
+    }
+    buildMeter.classList.toggle('is-max', done || pct >= 90);
+    if (pct > prev) {
+      buildMeter.classList.remove('is-pulse');
+      // reflow to retrigger animation
+      void buildMeter.offsetWidth;
+      buildMeter.classList.add('is-pulse');
+      window.clearTimeout(setBuildMeter._pulseTimer);
+      setBuildMeter._pulseTimer = window.setTimeout(() => {
+        buildMeter.classList.remove('is-pulse');
+      }, 700);
+    }
   }
 
   function hideChromeForBeat1() {
@@ -205,12 +259,14 @@
     if (progressLabel) progressLabel.textContent = '';
     welcome.hidden = true;
     restartBtn.hidden = true;
+    setBuildMeter(0, { hidden: true });
   }
 
   function showThinking() {
     clearPickerKeys();
     setPhase('sky');
     welcome.hidden = true;
+    if (history.length) setBuildMeter(history.length, { hidden: false });
     content.innerHTML = `
       <div class="thinking" role="status" aria-live="polite">
         <div class="spinner" aria-hidden="true"></div>
@@ -252,7 +308,7 @@
 
   function updateDraft(question, answer) {
     const q = (question || '').toLowerCase();
-    if (/rough idea|paste|already wrote/.test(q) && !draftBits.some((l) => l.startsWith('What I need:'))) {
+    if (/rough idea|paste|already wrote|what do you want/.test(q) && !draftBits.some((l) => l.startsWith('What I need:'))) {
       const short = answer.length > 120 ? answer.slice(0, 117) + '…' : answer;
       draftBits.push(`What I need: ${short}`);
     } else if (/want|help|trying|goal|do|category/.test(q) && !draftBits.some((l) => l.startsWith('What I need:'))) {
@@ -268,26 +324,33 @@
     }
   }
 
-  /** Beat 1 - only two big choices (game picker). */
+  /** Beat 1 - primary free-text / paste, secondary help starting. */
   function renderStartScreen() {
     clearPickerKeys();
-    current = { id: 'start', question: 'Where are you starting?', input: 'start', local: true };
+    current = { id: 'start', question: 'What do you want?', input: 'start', local: true };
     turn = 0;
     hideChromeForBeat1();
 
-    content.innerHTML = `<p class="question">Where are you starting?</p><div id="pickerMount"></div>
-      <button type="button" class="ghost" id="editProfile" style="margin-top:14px">Edit my info</button>`;
-    mountPicker(
-      content.querySelector('#pickerMount'),
-      [
-        { label: 'I wrote something', value: 'paste' },
-        { label: 'I need help starting', value: 'scratch' },
-      ],
-      (value) => {
-        if (value === 'paste') renderPasteScreen();
-        else renderCategoryScreen();
-      }
-    );
+    content.innerHTML = `
+      <p class="question">What do you want?</p>
+      <p class="lead">Explain it in your own words. Simple or detailed. We will build your prompt.</p>
+      <div class="paste-box gate-compose">
+        <textarea class="text-area gate-input" id="gateAnswer" maxlength="${PASTE_TEXT_MAX}" rows="6"
+          placeholder="Type or paste anything. Messy is fine."></textarea>
+        <button type="button" class="primary huge" id="sendGate" disabled>Build my prompt</button>
+        <button type="button" class="linkish" id="needHelp">I need help starting</button>
+        <button type="button" class="ghost" id="editProfile">Edit my info</button>
+      </div>`;
+
+    const ta = document.getElementById('gateAnswer');
+    const send = document.getElementById('sendGate');
+    const sync = () => { send.disabled = !ta.value.trim(); };
+    ta.addEventListener('input', sync);
+    send.addEventListener('click', () => {
+      const v = ta.value.trim();
+      if (v) submitStartPaste(v);
+    });
+    document.getElementById('needHelp').onclick = () => renderCategoryScreen();
     const edit = document.getElementById('editProfile');
     if (edit) edit.onclick = () => {
       const existing = loadProfile() || { who: '', explain: '', about: '' };
@@ -299,35 +362,12 @@
         editing: true,
       });
     };
+    setTimeout(() => ta && ta.focus(), 50);
   }
 
-  /** Beat 2a - paste only. */
+  /** Kept for compatibility; gate now owns paste. */
   function renderPasteScreen() {
-    clearPickerKeys();
-    setPhase('sky');
-    current = { id: 'q1', question: 'Paste what you have', input: 'paste', local: true };
-    turn = 1;
-    setProgress(1, false);
-    restartBtn.hidden = false;
-    welcome.hidden = true;
-
-    content.innerHTML = `
-      <p class="question">Paste what you have</p>
-      <div class="paste-box">
-        <textarea class="text-area" id="pasteAnswer" maxlength="${PASTE_TEXT_MAX}" rows="5"
-          placeholder="It can be messy"></textarea>
-        <button type="button" class="primary" id="sendPaste" disabled>Next</button>
-      </div>`;
-
-    const ta = document.getElementById('pasteAnswer');
-    const send = document.getElementById('sendPaste');
-    const sync = () => { send.disabled = !ta.value.trim(); };
-    ta.addEventListener('input', sync);
-    send.addEventListener('click', () => {
-      const v = ta.value.trim();
-      if (v) submitStartPaste(v);
-    });
-    setTimeout(() => ta.focus(), 50);
+    renderStartScreen();
   }
 
   /** Beat 2b - category picker only (no paste). */
@@ -337,6 +377,7 @@
     current = { id: 'q1', question: 'What are you working on?', input: 'choice', local: true };
     turn = 1;
     setProgress(1, false);
+    setBuildMeter(0, { hidden: false });
     restartBtn.hidden = false;
     welcome.hidden = true;
 
@@ -363,7 +404,7 @@
   function submitStartPaste(answer) {
     const latest = {
       id: 'q1',
-      question: 'Paste what you have',
+      question: 'What do you want?',
       answer: answer.slice(0, PASTE_TEXT_MAX),
     };
     updateDraft(latest.question, latest.answer);
@@ -377,6 +418,7 @@
     current = q;
     turn = history.length + 1;
     setProgress(Math.min(turn, MAX_DOTS), turn >= 5);
+    setBuildMeter(history.length, { hidden: false });
     restartBtn.hidden = false;
     welcome.hidden = true;
 
@@ -424,6 +466,7 @@
     setPhase('sky');
     current = null;
     setProgress(MAX_DOTS, true);
+    setBuildMeter(history.length, { done: true, hidden: false });
     restartBtn.hidden = false;
     welcome.hidden = true;
     content.innerHTML = `
@@ -563,6 +606,7 @@
         profile: loadProfile(),
       });
       history = nextHistory;
+      setBuildMeter(history.length, { done: data.type === 'done', hidden: false });
       if (data.type === 'done') renderDone(data.prompt);
       else renderQuestion(data);
     } catch {
