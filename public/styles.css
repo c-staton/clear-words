@@ -370,3 +370,128 @@ body[data-phase="profile"] .build-meter {
     transition: none !important;
   }
 }
+
+/* ——— Align sky quiz column ——— */
+:root {
+  --content-col: min(100%, 30rem);
+}
+
+.top {
+  width: var(--content-col);
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.build-meter {
+  width: var(--content-col);
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 4px;
+}
+
+.focus {
+  width: var(--content-col);
+  max-width: 100%;
+}
+
+/* Stop floating the quiz in the vertical middle under the meter */
+body[data-phase="sky"] .stage {
+  justify-content: flex-start !important;
+  align-items: center;
+  padding-top: 10px !important;
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important;
+}
+
+body[data-phase="sky"] .focus {
+  justify-content: flex-start;
+  gap: 12px;
+  transform: none !important;
+}
+
+body[data-phase="sky"] .question {
+  max-width: 100%;
+}
+
+/* Keep picker labels stacked on one left edge; caret always reserved */
+.picker {
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.picker-item {
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 0;
+  transform: none;
+  transform-origin: left center;
+}
+
+.picker-item.is-near {
+  transform: none;
+  opacity: 0.5;
+}
+
+.picker-item.is-on {
+  transform: scale(1.03);
+  transform-origin: left center;
+  opacity: 1;
+}
+
+.picker-caret {
+  width: 10px;
+  height: 12px;
+  border: 0;
+  background: var(--accent);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  opacity: 0;
+  transform: none;
+  filter: drop-shadow(0 0 8px rgba(255, 122, 69, 0.55));
+  flex-shrink: 0;
+}
+
+.picker-item.is-on .picker-caret {
+  opacity: 1;
+  transform: none;
+  animation: caretPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes caretPulse {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 122, 69, 0.4)); opacity: 1; }
+  50% { filter: drop-shadow(0 0 14px rgba(255, 122, 69, 0.85)); opacity: 1; }
+}
+
+.picker-hint {
+  margin-top: 8px;
+  text-align: left;
+}
+
+@media (max-width: 599px) {
+  body[data-phase="sky"] .stage {
+    justify-content: flex-start !important;
+    padding-top: 8px !important;
+  }
+
+  body[data-phase="sky"] .focus {
+    transform: none !important;
+    gap: 14px;
+  }
+
+  .top,
+  .build-meter,
+  .focus {
+    width: 100%;
+  }
+}
+
+@media (min-width: 600px) {
+  :root {
+    --content-col: min(100%, 32rem);
+  }
+
+  .picker-item {
+    min-height: 48px;
+    font-size: 1.45rem;
+  }
+}
