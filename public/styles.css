@@ -398,15 +398,18 @@ body[data-phase="profile"] .build-meter {
 
 /* Stop floating the quiz in the vertical middle under the meter */
 body[data-phase="sky"] .stage {
-  justify-content: flex-start !important;
+  justify-content: center !important;
   align-items: center;
-  padding-top: 10px !important;
+  padding-top: 0 !important;
   padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important;
 }
 
 body[data-phase="sky"] .focus {
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: stretch;
   gap: 12px;
+  width: var(--content-col);
+  max-width: 100%;
   transform: none !important;
 }
 
@@ -469,8 +472,8 @@ body[data-phase="sky"] .question {
 
 @media (max-width: 599px) {
   body[data-phase="sky"] .stage {
-    justify-content: flex-start !important;
-    padding-top: 8px !important;
+    justify-content: center !important;
+    padding-top: 0 !important;
   }
 
   body[data-phase="sky"] .focus {
@@ -509,7 +512,7 @@ body[data-phase="sky"] .build-meter {
 }
 
 body[data-phase="sky"] .stage {
-  padding-top: 6px !important;
+  padding-top: 0 !important;
   gap: 0;
 }
 
@@ -562,7 +565,8 @@ body[data-phase="sky"] .picker-hint {
 
 @media (max-width: 599px) {
   body[data-phase="sky"] .stage {
-    padding-top: 4px !important;
+    justify-content: center !important;
+    padding-top: 0 !important;
   }
 
   body[data-phase="sky"] .focus {
@@ -573,70 +577,6 @@ body[data-phase="sky"] .picker-hint {
     margin-bottom: 0;
   }
 }
-
-/* ——— Center sky content under meter ——— */
-/* Meter stays full column width; question + picker sit as a centered cluster */
-body[data-phase="sky"] .focus {
-  align-items: center;
-  text-align: center;
-}
-
-body[data-phase="sky"] .question {
-  text-align: center;
-  width: 100%;
-  max-width: 18ch;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-body[data-phase="sky"] .picker,
-body[data-phase="sky"] #pickerMount {
-  width: max-content;
-  max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: left; /* labels still left-aligned to each other */
-}
-
-body[data-phase="sky"] .picker-hint {
-  text-align: center;
-  width: 100%;
-}
-
-/* Text / next steps still use full column width */
-body[data-phase="sky"] .paste-box,
-body[data-phase="sky"] .text-row,
-body[data-phase="sky"] .gate-compose,
-body[data-phase="sky"] .prompt-box,
-body[data-phase="sky"] .error-box,
-body[data-phase="sky"] .thinking,
-body[data-phase="sky"] .primary,
-body[data-phase="sky"] .text-input,
-body[data-phase="sky"] .text-area {
-  width: 100%;
-  max-width: 100%;
-  text-align: left;
-  align-self: stretch;
-}
-
-body[data-phase="sky"] .focus:has(.paste-box),
-body[data-phase="sky"] .focus:has(.text-row),
-body[data-phase="sky"] .focus:has(.text-area),
-body[data-phase="sky"] .focus:has(.prompt-box) {
-  align-items: stretch;
-  text-align: left;
-}
-
-body[data-phase="sky"] .focus:has(.paste-box) .question,
-body[data-phase="sky"] .focus:has(.text-row) .question,
-body[data-phase="sky"] .focus:has(.text-area) .question,
-body[data-phase="sky"] .focus:has(.prompt-box) .question {
-  text-align: left;
-  max-width: none;
-  margin-left: 0;
-  margin-right: 0;
-}
-
 textarea.prompt-box {
   display: block;
   width: 100%;
@@ -651,4 +591,27 @@ textarea.prompt-box {
   white-space: pre-wrap;
   tab-size: 2;
   cursor: text;
+}
+
+
+/* Sky quiz: left column, vertically centered in remaining view (not text-center cluster) */
+body[data-phase="sky"] .question {
+  text-align: left;
+  max-width: none;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+body[data-phase="sky"] .picker,
+body[data-phase="sky"] #pickerMount {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+}
+
+body[data-phase="sky"] .picker-hint {
+  text-align: left;
 }
