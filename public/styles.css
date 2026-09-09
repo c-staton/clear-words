@@ -741,3 +741,99 @@ body[data-phase="sky"] .top #restartBtn:hover {
 /* No right-side status words on Prompt power */
 .build-meter-label { display: none !important; }
 .build-meter-head { justify-content: flex-start; }
+
+/* ——— Picker: one left edge for all labels ——— */
+.picker-item,
+.picker-item.is-near,
+.picker-item.is-on,
+.picker-item:nth-child(even) {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0 !important;
+  padding: 10px 0 !important;
+  padding-left: 0 !important;
+  transform: none !important;
+  transform-origin: left center;
+  letter-spacing: -0.04em;
+}
+
+.picker-item {
+  opacity: 0.34;
+  position: relative;
+}
+
+.picker-item.is-near {
+  opacity: 0.55;
+}
+
+.picker-item.is-on {
+  opacity: 1;
+  font-weight: 700;
+}
+
+/* Caret hangs in the left gutter; labels share the question's left edge */
+.picker-caret {
+  position: absolute !important;
+  left: -1.1rem;
+  top: 50%;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin: 0;
+  margin-top: -0.35rem;
+  border: 0 !important;
+  background: var(--accent);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  opacity: 0;
+  transform: none !important;
+  flex: none;
+  pointer-events: none;
+}
+
+.picker-item.is-on .picker-caret {
+  opacity: 1;
+  animation: caretPulse 1.2s ease-in-out infinite;
+}
+
+.picker-label {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.picker,
+#pickerMount,
+.picker-list {
+  width: 100%;
+  margin: 0;
+  padding-left: 0;
+}
+
+.picker-hint {
+  text-align: left;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+body[data-phase="sky"] .question {
+  padding-left: 0;
+  margin-left: 0;
+  text-align: left;
+}
+
+@keyframes caretPulse {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 122, 69, 0.4)); }
+  50% { filter: drop-shadow(0 0 12px rgba(255, 122, 69, 0.85)); }
+}
+
+@media (max-width: 599px) {
+  .picker-caret {
+    left: -1rem;
+  }
+  .focus {
+    transform: none !important;
+  }
+}
