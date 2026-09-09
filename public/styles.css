@@ -737,3 +737,7 @@ body[data-phase="sky"] .top #restartBtn:hover {
     padding-top: 4px;
   }
 }
+
+/* No right-side status words on Prompt power */
+.build-meter-label { display: none !important; }
+.build-meter-head { justify-content: flex-start; }

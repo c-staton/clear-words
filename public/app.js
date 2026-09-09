@@ -7,7 +7,6 @@
   const restartBtn = document.getElementById('restartBtn');
   const buildMeter = document.getElementById('buildMeter');
   const buildMeterFill = document.getElementById('buildMeterFill');
-  const buildMeterLabel = document.getElementById('buildMeterLabel');
 
   const THINKING_WORDS = ['One sec...', 'Putting this together...', 'Got it...'];
   const MAX_DOTS = 7;
@@ -202,15 +201,6 @@
     if (dots) dots.innerHTML = '';
   }
 
-  const METER_WORDS = [
-    'Getting started',
-    'Warming up',
-    'Taking shape',
-    'Getting clearer',
-    'Almost there',
-    'Looking strong',
-    'Ready to paste',
-  ];
 
   function meterPercent(answerCount, done) {
     if (done) return 100;
@@ -236,10 +226,6 @@
     buildMeter.dataset.pct = String(pct);
     buildMeterFill.style.width = pct + '%';
     buildMeter.setAttribute('aria-valuenow', String(pct));
-    if (buildMeterLabel) {
-      const idx = done ? METER_WORDS.length - 1 : Math.min(METER_WORDS.length - 2, Math.floor(pct / 16));
-      buildMeterLabel.textContent = METER_WORDS[idx];
-    }
     buildMeter.classList.toggle('is-max', done || pct >= 90);
     if (pct > prev) {
       buildMeter.classList.remove('is-pulse');
