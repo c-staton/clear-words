@@ -615,3 +615,67 @@ body[data-phase="sky"] #pickerMount {
 body[data-phase="sky"] .picker-hint {
   text-align: left;
 }
+
+/* ——— Top nav = Prompt power (no logo) ——— */
+.brand {
+  display: none !important; /* logo removed from top nav */
+}
+
+.top {
+  width: 100%;
+  max-width: var(--content-col, min(100%, 32rem));
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-height: 0;
+  padding: 2px 0 8px;
+}
+
+/* When meter is active it replaces the nav */
+.top:has(.build-meter:not([hidden])) {
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 12px;
+  min-height: 44px;
+}
+
+.top .build-meter {
+  flex: 1 1 auto;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  align-self: stretch;
+}
+
+.top .build-meter[hidden] {
+  display: none !important;
+}
+
+.top #restartBtn {
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+/* Gate: no fake empty nav chrome */
+body[data-phase="gate"] .top {
+  min-height: 0;
+  padding: 0;
+  margin: 0 auto;
+}
+
+body[data-phase="gate"] .top:not(:has(#restartBtn:not([hidden]))) {
+  display: none;
+}
+
+/* Sky: meter is the nav; stage uses full remaining height */
+body[data-phase="sky"] .top {
+  margin-bottom: 4px;
+}
+
+body[data-phase="sky"] .stage {
+  justify-content: center !important;
+  padding-top: 0 !important;
+}

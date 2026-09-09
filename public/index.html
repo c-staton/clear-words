@@ -9,7 +9,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="description" content="Turn what you mean into words you can use." />
   <title>Clear Words</title>
-  <link rel="stylesheet" href="/styles.css?v=vspace1" />
+  <link rel="stylesheet" href="/styles.css?v=navmeter1" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -26,37 +26,32 @@
   <canvas id="fog" class="fog" aria-hidden="true"></canvas>
 
   <main class="app" id="app">
-    <header class="top">
-      <div class="brand">
-        <span class="logo" aria-hidden="true"></span>
-        <span class="brand-name">Clear Words</span>
+    <header class="top" id="topBar">
+      <div
+        class="build-meter"
+        id="buildMeter"
+        hidden
+        data-pct="0"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+        aria-label="Prompt power"
+      >
+        <div class="build-meter-head">
+          <span class="build-meter-title">Prompt power</span>
+          <span class="build-meter-label" id="buildMeterLabel">Getting started</span>
+        </div>
+        <div class="build-meter-track">
+          <div class="build-meter-fill" id="buildMeterFill"></div>
+          <span class="build-meter-spark s1" aria-hidden="true"></span>
+          <span class="build-meter-spark s2" aria-hidden="true"></span>
+          <span class="build-meter-spark s3" aria-hidden="true"></span>
+          <span class="build-meter-spark s4" aria-hidden="true"></span>
+        </div>
       </div>
       <button type="button" class="ghost" id="restartBtn" hidden>Start over</button>
     </header>
-
-    <div
-      class="build-meter"
-      id="buildMeter"
-      hidden
-      data-pct="0"
-      role="progressbar"
-      aria-valuemin="0"
-      aria-valuemax="100"
-      aria-valuenow="0"
-      aria-label="Prompt power"
-    >
-      <div class="build-meter-head">
-        <span class="build-meter-title">Prompt power</span>
-        <span class="build-meter-label" id="buildMeterLabel">Getting started</span>
-      </div>
-      <div class="build-meter-track">
-        <div class="build-meter-fill" id="buildMeterFill"></div>
-        <span class="build-meter-spark s1" aria-hidden="true"></span>
-        <span class="build-meter-spark s2" aria-hidden="true"></span>
-        <span class="build-meter-spark s3" aria-hidden="true"></span>
-        <span class="build-meter-spark s4" aria-hidden="true"></span>
-      </div>
-    </div>
 
     <section class="stage" id="screen">
       <p class="welcome" id="welcome" hidden></p>
@@ -64,7 +59,7 @@
     </section>
   </main>
 
-  <script src="/fog.js?v=vspace1"></script>
-  <script src="/app.js?v=vspace1"></script>
+  <script src="/fog.js?v=navmeter1"></script>
+  <script src="/app.js?v=navmeter1"></script>
 </body>
 </html>
