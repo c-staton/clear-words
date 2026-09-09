@@ -14,9 +14,10 @@
   const START_CHIPS = [
     { label: 'Writing', answer: 'Writing' },
     { label: 'Learning', answer: 'Learning' },
-    { label: 'Planning', answer: 'Planning' },
-    { label: 'Solving', answer: 'Solving' },
-    { label: 'Fun', answer: 'Fun' },
+    { label: 'A website or app', answer: 'A website or app' },
+    { label: 'A plan', answer: 'A plan' },
+    { label: 'A problem to solve', answer: 'A problem to solve' },
+    { label: 'Something fun', answer: 'Something fun' },
   ];
 
   const PROFILE_KEY = 'clearWordsProfile';
