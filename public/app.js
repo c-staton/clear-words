@@ -327,13 +327,13 @@
   /** Beat 1 - primary free-text / paste, secondary help starting. */
   function renderStartScreen() {
     clearPickerKeys();
-    current = { id: 'start', question: 'What do you want?', input: 'start', local: true };
+    current = { id: 'start', question: 'What would you like to accomplish with AI?', input: 'start', local: true };
     turn = 0;
     hideChromeForBeat1();
 
     content.innerHTML = `
-      <p class="question">What do you want?</p>
-      <p class="lead">Explain it in your own words. Simple or detailed. We will build your prompt.</p>
+      <p class="question">What would you like to accomplish with AI?</p>
+      <p class="lead">Let's start your prompt. Say it in your own words — simple or detailed is fine.</p>
       <div class="paste-box gate-compose">
         <textarea class="text-area gate-input" id="gateAnswer" maxlength="${PASTE_TEXT_MAX}" rows="6"
           placeholder="Type or paste anything. Messy is fine."></textarea>
@@ -404,7 +404,7 @@
   function submitStartPaste(answer) {
     const latest = {
       id: 'q1',
-      question: 'What do you want?',
+      question: 'What would you like to accomplish with AI?',
       answer: answer.slice(0, PASTE_TEXT_MAX),
     };
     updateDraft(latest.question, latest.answer);
