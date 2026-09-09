@@ -679,3 +679,61 @@ body[data-phase="sky"] .stage {
   justify-content: center !important;
   padding-top: 0 !important;
 }
+
+/* ——— navmeter polish ——— */
+/* Compact power strip in top; leave stage breathing room */
+body[data-phase="sky"] .top {
+  margin-bottom: 0;
+  padding-bottom: 6px;
+}
+
+body[data-phase="sky"] .top .build-meter {
+  padding: 8px 12px 9px;
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 122, 69, 0.2);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.35) inset,
+    0 6px 16px rgba(60, 120, 170, 0.08);
+}
+
+body[data-phase="sky"] .top .build-meter-track {
+  height: 10px;
+}
+
+body[data-phase="sky"] .top .build-meter-head {
+  margin-bottom: 5px;
+}
+
+/* Gate: no empty header; give stage a little top inset for brandless chrome */
+body[data-phase="gate"] .stage {
+  padding-top: max(8px, env(safe-area-inset-top, 0px));
+}
+
+body[data-phase="gate"] .focus {
+  gap: 14px;
+}
+
+/* Restart beside meter — quieter so meter owns the nav */
+body[data-phase="sky"] .top #restartBtn {
+  opacity: 0.85;
+  backdrop-filter: blur(10px);
+}
+
+body[data-phase="sky"] .top #restartBtn:hover {
+  opacity: 1;
+}
+
+@media (max-width: 599px) {
+  body[data-phase="sky"] .top {
+    padding-bottom: 4px;
+    gap: 8px;
+  }
+
+  body[data-phase="sky"] .top .build-meter {
+    padding: 7px 10px 8px;
+  }
+
+  body[data-phase="gate"] .stage {
+    padding-top: 4px;
+  }
+}
