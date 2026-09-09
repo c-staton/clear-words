@@ -289,8 +289,14 @@
     );
     const edit = document.getElementById('editProfile');
     if (edit) edit.onclick = () => {
-      clearProfile();
-      renderProfileSetup();
+      const existing = loadProfile() || { who: '', explain: '', about: '' };
+      renderProfileSetup({
+        who: existing.who || '',
+        explain: existing.explain || '',
+        about: existing.about || '',
+        step: 'who',
+        editing: true,
+      });
     };
   }
 
@@ -458,37 +464,65 @@
 
   function renderProfileSetup(draft) {
     clearPickerKeys();
-    const state = draft || { who: '', explain: '', about: '' };
+    const state = Object.assign({ who: '', explain: '', about: '', step: 'who', editing: false }, draft || {});
+    const existing = loadProfile();
     hideChromeForBeat1();
     setPhase('gate');
-
-    if (!state.who) {
-      content.innerHTML = `<p class="question">Quick setup. Who is this for?</p><div id="pickerMount"></div>
-        <p class="picker-hint">One time. We save this on this device.</p>`;
-      mountPicker(content.querySelector('#pickerMount'), PROFILE_WHO, (value) => {
-        renderProfileSetup({ ...state, who: value });
-      });
-      return;
-    }
-
-    if (!state.explain) {
-      restartBtn.hidden = false;
-      content.innerHTML = `<p class="question">How should answers sound?</p><div id="pickerMount"></div>`;
-      mountPicker(content.querySelector('#pickerMount'), PROFILE_EXPLAIN, (value) => {
-        renderProfileSetup({ ...state, explain: value });
-      });
-      return;
-    }
-
     restartBtn.hidden = false;
+
+    const goBack = () => {
+      if (state.editing && existing) {
+        renderStartScreen();
+        return;
+      }
+      if (state.step === 'explain') {
+        renderProfileSetup(Object.assign({}, state, { step: 'who' }));
+        return;
+      }
+      if (state.step === 'about') {
+        renderProfileSetup(Object.assign({}, state, { step: 'explain' }));
+        return;
+      }
+      // first-time setup, first step: nowhere to go except stay
+      renderStartScreen();
+    };
+
+    const backBtn = state.editing || state.step !== 'who'
+      ? `<button type="button" class="ghost" id="profileBack" style="align-self:flex-start">Back</button>`
+      : '';
+
+    if (state.step === 'who' || (!state.who && state.step !== 'explain' && state.step !== 'about')) {
+      state.step = 'who';
+      content.innerHTML = `${backBtn}<p class="question">Quick setup. Who is this for?</p><div id="pickerMount"></div>
+        <p class="picker-hint">One time. We save this on this device.</p>`;
+      if (document.getElementById('profileBack')) document.getElementById('profileBack').onclick = goBack;
+      mountPicker(content.querySelector('#pickerMount'), PROFILE_WHO, (value) => {
+        renderProfileSetup(Object.assign({}, state, { who: value, step: 'explain' }));
+      });
+      return;
+    }
+
+    if (state.step === 'explain' || (!state.explain && state.step !== 'about')) {
+      state.step = 'explain';
+      content.innerHTML = `${backBtn}<p class="question">How should answers sound?</p><div id="pickerMount"></div>`;
+      if (document.getElementById('profileBack')) document.getElementById('profileBack').onclick = goBack;
+      mountPicker(content.querySelector('#pickerMount'), PROFILE_EXPLAIN, (value) => {
+        renderProfileSetup(Object.assign({}, state, { explain: value, step: 'about' }));
+      });
+      return;
+    }
+
+    state.step = 'about';
     content.innerHTML = `
+      ${backBtn}
       <p class="question">Anything else to know about you?</p>
       <div class="paste-box">
         <textarea class="text-area" id="aboutAnswer" maxlength="240" rows="4"
-          placeholder="School, work, hobbies, or skip"></textarea>
+          placeholder="School, work, hobbies, or skip">${escapeHtml(state.about || '')}</textarea>
         <button type="button" class="primary" id="saveProfile">Save and continue</button>
         <button type="button" class="ghost" id="skipAbout" style="margin-top:10px">Skip</button>
       </div>`;
+    if (document.getElementById('profileBack')) document.getElementById('profileBack').onclick = goBack;
 
     const finish = (about) => {
       saveProfile({ who: state.who, explain: state.explain, about: about || '' });
@@ -496,9 +530,10 @@
     };
     const ta = document.getElementById('aboutAnswer');
     document.getElementById('saveProfile').onclick = () => finish(ta.value.trim());
-    document.getElementById('skipAbout').onclick = () => finish('');
-    setTimeout(() => ta.focus(), 50);
+    document.getElementById('skipAbout').onclick = () => finish(state.about || '');
+    setTimeout(() => ta && ta.focus(), 50);
   }
+
 
   async function submitAnswer(answer) {
     if (!current || !answer) return;
