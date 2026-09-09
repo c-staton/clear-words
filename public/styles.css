@@ -28,19 +28,29 @@
 
 html, body {
   margin: 0;
-  min-height: 100%;
+  width: 100%;
+  height: 100%;
   color: var(--ink);
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+html {
+  height: 100dvh;
+  height: 100svh;
 }
 
 body {
   min-height: 100dvh;
+  min-height: 100svh;
   display: flex;
   justify-content: center;
+  align-items: stretch;
   font-family: var(--font);
-  overflow-x: hidden;
+  overflow: hidden;
   background: var(--sky-mid);
+  position: relative;
 }
 
 /* --- Sky world --- */
@@ -175,28 +185,35 @@ body {
   height: 100%;
 }
 
-/* --- App shell --- */
+/* --- App shell (phone-native) --- */
 .app {
   position: relative;
   z-index: 2;
-  width: min(430px, 100%);
+  width: 100%;
+  max-width: 560px;
+  height: 100dvh;
+  height: 100svh;
   min-height: 100dvh;
   min-height: 100svh;
+  margin: 0 auto;
   padding:
-    max(12px, env(safe-area-inset-top))
-    max(18px, env(safe-area-inset-right))
-    max(24px, env(safe-area-inset-bottom))
-    max(18px, env(safe-area-inset-left));
+    max(12px, env(safe-area-inset-top, 0px))
+    max(22px, env(safe-area-inset-right, 0px))
+    max(18px, env(safe-area-inset-bottom, 0px))
+    max(22px, env(safe-area-inset-left, 0px));
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
+  box-sizing: border-box;
 }
 
 .top {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 0;
+  padding: 2px 0 8px;
+  min-height: 44px;
   transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
 }
 
@@ -257,18 +274,24 @@ body[data-phase="sky"] .top {
   outline-offset: 2px;
 }
 
-/* --- Stage: full-focus, NOT a card --- */
+/* --- Stage: full-viewport app screen --- */
 .stage {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 22px;
-  padding: 8px 0 24px;
+  align-items: center;
+  gap: 0;
+  padding: 0 0 clamp(16px, 9vh, 72px);
   min-height: 0;
+  width: 100%;
   background: transparent;
   border: 0;
   box-shadow: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   animation: floatIn 0.55s var(--ease);
 }
 
@@ -292,9 +315,10 @@ body[data-phase="gate"] .stage {
 .focus {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: stretch;
-  gap: 18px;
-  width: 100%;
+  gap: 20px;
+  width: min(100%, 22rem);
   max-width: 100%;
   margin: 0 auto;
 }
@@ -345,8 +369,8 @@ body[data-phase="gate"] .stage {
 }
 
 body[data-phase="gate"] .question {
-  max-width: 100%;
-  font-size: clamp(1.85rem, 7.8vw, 2.5rem);
+  max-width: none;
+  font-size: clamp(1.85rem, 7.8vw, 2.45rem);
 }
 
 /* Gate choices - sharp slabs */
@@ -645,83 +669,6 @@ body[data-phase="gate"] .question {
   font-weight: 600;
 }
 
-@media (min-width: 600px) {
-  .app { padding: 20px 24px 48px; }
-  .choice-btn { min-height: 88px; font-size: 1.2rem; }
-  .chip { padding: 14px 20px; font-size: 1.05rem; }
-  body[data-phase="sky"] .stage { padding-top: 0; justify-content: center; }
-}
-
-
-/* Mobile app feel: center the action, thumb-friendly */
-@media (max-width: 599px) {
-  body {
-    align-items: stretch;
-  }
-
-  .app {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .stage {
-    justify-content: center !important;
-    padding-top: 0 !important;
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
-    gap: 18px;
-  }
-
-  .focus {
-    width: 100%;
-    margin-inline: auto;
-  }
-
-  .question {
-    max-width: 100%;
-    text-wrap: pretty;
-  }
-
-  .picker {
-    width: 100%;
-  }
-
-  .picker-item {
-    min-height: 56px;
-    padding-top: 14px;
-    padding-bottom: 14px;
-  }
-
-  .picker-label {
-    font-size: 1.12rem;
-  }
-
-  .primary,
-  .primary.huge {
-    width: 100%;
-    min-height: 56px;
-    font-size: 1.05rem;
-  }
-
-  .text-area,
-  .text-input {
-    font-size: 16px; /* prevent iOS zoom */
-    min-height: 52px;
-  }
-
-  .paste-box,
-  .text-row {
-    width: 100%;
-  }
-
-  .done-title {
-    max-width: 100%;
-  }
-
-  .prompt-box {
-    max-height: 42dvh;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .sky-wash, .sun, .cloud, .stage, .question, .chip.selected, .spinner {
     animation: none !important;
@@ -882,10 +829,6 @@ body[data-phase="gate"] .question {
   display: none !important;
 }
 
-@media (min-width: 600px) {
-  .picker-item { font-size: 1.55rem; min-height: 54px; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .picker-item, .picker-caret {
     transition: none !important;
@@ -914,4 +857,78 @@ body[data-phase="gate"] .question {
 .picker-item.is-on {
   margin-left: 0;
   transform: translateX(6px) scale(1.06);
+}
+
+
+/* Phone app framing — native screen, not webpage */
+@media (max-width: 599px) {
+  body {
+    align-items: stretch;
+  }
+
+  .app {
+    width: 100%;
+    max-width: none;
+  }
+
+  .stage {
+    justify-content: center !important;
+    align-items: center;
+    padding-top: 0 !important;
+    padding-bottom: max(20px, calc(env(safe-area-inset-bottom, 0px) + 12px));
+  }
+
+  .focus {
+    width: 100%;
+    max-width: none;
+    gap: 22px;
+    /* sit in lower-middle thumb zone */
+    transform: translateY(min(3vh, 28px));
+  }
+
+  .question {
+    max-width: 100%;
+    text-wrap: pretty;
+  }
+
+  .picker,
+  #pickerMount {
+    width: 100%;
+  }
+
+  .picker-item {
+    min-height: 56px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    font-size: clamp(1.2rem, 5.2vw, 1.4rem);
+  }
+
+  .text-area {
+    min-height: 132px;
+  }
+
+  .primary,
+  .primary.huge {
+    width: 100%;
+    min-height: 56px;
+  }
+}
+
+@media (min-width: 600px) {
+  .app {
+    padding:
+      max(20px, env(safe-area-inset-top, 0px))
+      28px
+      max(28px, env(safe-area-inset-bottom, 0px))
+      28px;
+  }
+
+  .focus {
+    width: min(100%, 24rem);
+  }
+
+  .picker-item {
+    font-size: 1.55rem;
+    min-height: 54px;
+  }
 }
