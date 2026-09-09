@@ -179,12 +179,17 @@ body {
 .app {
   position: relative;
   z-index: 2;
-  width: min(560px, 100%);
+  width: min(430px, 100%);
   min-height: 100dvh;
-  padding: 14px 16px max(28px, env(safe-area-inset-bottom));
+  min-height: 100svh;
+  padding:
+    max(12px, env(safe-area-inset-top))
+    max(18px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom))
+    max(18px, env(safe-area-inset-left));
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .top {
@@ -278,16 +283,20 @@ body[data-phase="sky"] .top {
   }
 }
 
-body[data-phase="sky"] .stage {
-  justify-content: flex-start;
-  padding-top: 4vh;
+body[data-phase="sky"] .stage,
+body[data-phase="gate"] .stage {
+  justify-content: center;
+  padding-top: 0;
 }
 
 .focus {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: stretch;
+  gap: 18px;
+  width: 100%;
   max-width: 100%;
+  margin: 0 auto;
 }
 
 .welcome {
@@ -312,13 +321,15 @@ body[data-phase="sky"] .stage {
 /* Question - big sky type */
 .question {
   margin: 0;
-  font-size: clamp(1.75rem, 7vw, 2.35rem);
-  line-height: 1.05;
+  font-size: clamp(1.7rem, 7.2vw, 2.35rem);
+  line-height: 1.12;
   font-weight: 700;
   letter-spacing: -0.045em;
   color: var(--ink);
   text-shadow: 0 2px 0 rgba(255, 255, 255, 0.25);
-  max-width: 14ch;
+  max-width: 100%;
+  width: 100%;
+  text-align: left;
   animation: questionIn 0.5s var(--ease);
 }
 
@@ -334,8 +345,8 @@ body[data-phase="sky"] .stage {
 }
 
 body[data-phase="gate"] .question {
-  max-width: 12ch;
-  font-size: clamp(1.9rem, 8vw, 2.6rem);
+  max-width: 100%;
+  font-size: clamp(1.85rem, 7.8vw, 2.5rem);
 }
 
 /* Gate choices - sharp slabs */
@@ -638,7 +649,77 @@ body[data-phase="gate"] .question {
   .app { padding: 20px 24px 48px; }
   .choice-btn { min-height: 88px; font-size: 1.2rem; }
   .chip { padding: 14px 20px; font-size: 1.05rem; }
-  body[data-phase="sky"] .stage { padding-top: 12vh; }
+  body[data-phase="sky"] .stage { padding-top: 0; justify-content: center; }
+}
+
+
+/* Mobile app feel: center the action, thumb-friendly */
+@media (max-width: 599px) {
+  body {
+    align-items: stretch;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .stage {
+    justify-content: center !important;
+    padding-top: 0 !important;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    gap: 18px;
+  }
+
+  .focus {
+    width: 100%;
+    margin-inline: auto;
+  }
+
+  .question {
+    max-width: 100%;
+    text-wrap: pretty;
+  }
+
+  .picker {
+    width: 100%;
+  }
+
+  .picker-item {
+    min-height: 56px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .picker-label {
+    font-size: 1.12rem;
+  }
+
+  .primary,
+  .primary.huge {
+    width: 100%;
+    min-height: 56px;
+    font-size: 1.05rem;
+  }
+
+  .text-area,
+  .text-input {
+    font-size: 16px; /* prevent iOS zoom */
+    min-height: 52px;
+  }
+
+  .paste-box,
+  .text-row {
+    width: 100%;
+  }
+
+  .done-title {
+    max-width: 100%;
+  }
+
+  .prompt-box {
+    max-height: 42dvh;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
