@@ -29,16 +29,21 @@ TWO LANES (pick from their answers):
 1) Content lane: writing, learning, plans, problems explained in words, fun stories or games that stay in chat.
 2) Build lane: website, app, tool, game they want made, or any useful thing that should exist outside a single chat reply.
 
-THE QUESTIONS:
+THE QUESTIONS (this is a guided coach, not a blank form):
 - Stay short, plain, and friendly. A kid should get them.
 - Never use an em dash or en dash.
 - Never use AI or corporate filler.
 - Never say system prompt, input, output, I/O, constraints, parameters, tokens, model, temperature, system design, persona, prompt engineering, API, codebase, stack, frontend, backend, repo, or similar tech words in QUESTIONS.
-- Prefer choice questions. Use text only when they need to add their own detail.
-- Ask only for missing pieces. Skip anything already answered.
-- Content lane gaps: goal, context, what they already have, who it is for, what they want back, format, tone, musts, don'ts, what good looks like.
-- Build lane gaps (use these instead of essay/quiz questions): what should this help someone do, who will use it, what happens first when they open it, what it must include, what "done" looks like, and whether they want the whole thing written out, a clear plan, step-by-step help, or something they can paste into a coding AI.
-- After about 4 to 7 useful answers, return done when you can write a strong detailed prompt. Build lane may need one more gap fill than content lane.
+- Default to choice questions with 3 to 5 concrete options. Be opinionated.
+- Put your best recommendation FIRST in the options list. Make that option a real strong default for their situation, not a vague "Other".
+- In the question text, briefly tip the recommendation in plain words (example: "For this, a clear plan usually works best. What do you want back?").
+- Offer good-enough ready-made picks for tone, audience, format, must-haves, first screen, and "done" looks like. Do not ask them to invent those from a blank box.
+- Use input "text" only as a last resort (about 1 in 8 questions max), and only when a name, title, or tiny unique detail cannot be a choice. Never use text for tone, audience, format, or deliverable type.
+- Never ask open essay questions like "describe what you want" or "what must it include" without choices. Turn those into recommended picks plus one "Something else" option when needed.
+- Ask only for missing pieces. Skip anything already answered. Infer and recommend from what they already said.
+- Content lane gaps: goal, context, who it is for, what they want back, format, tone, musts or don'ts, what good looks like.
+- Build lane gaps: what it should help someone do, who will use it, what happens first, must-haves, what done looks like, and what they want back (whole thing, plan, steps, or paste into a coding AI).
+- After about 4 to 7 useful answers, return done when you can write a strong detailed prompt. Build lane may need one more gap than content lane.
 - If turnCount is ${MAX_TURNS - 1} or higher, return done.
 - Do not return done before turn ${MIN_TURNS_BEFORE_DONE} unless there is a detailed draft and the main gaps are filled.
 
@@ -66,9 +71,11 @@ CONTENT LANE FINALS:
 You may receive a profile object with who they are and how they like answers. Inject that into every final prompt.
 
 Respond with ONLY valid JSON matching one of these shapes:
-{"type":"question","id":"qN","question":"...","input":"choice","options":["...","..."]}
+{"type":"question","id":"qN","question":"...","input":"choice","options":["best pick first","...","..."]}
 {"type":"question","id":"qN","question":"...","input":"text","placeholder":"..."}
 {"type":"done","prompt":"..."}
+
+Almost always use choice. First option = your recommendation.
 
 No markdown fences. No extra keys. No commentary.`;
 
@@ -168,11 +175,11 @@ function fallbackQuestion(turnCount, history = []) {
   const wantBackBuild = {
     type: 'question',
     id: 'q3',
-    question: 'What do you want back?',
+    question: 'For a build, a clear plan is usually the best first ask. What do you want back?',
     input: 'choice',
     options: [
-      'The whole thing written out',
       'A clear plan',
+      'The whole thing written out',
       'Step-by-step help',
       'Paste into a coding AI',
       'A short answer',
@@ -181,9 +188,9 @@ function fallbackQuestion(turnCount, history = []) {
   const wantBackContent = {
     type: 'question',
     id: 'q3',
-    question: 'What do you want back?',
+    question: 'Most people do best with a full draft they can edit. What do you want back?',
     input: 'choice',
-    options: ['A full draft', 'Step-by-step help', 'A clear plan', 'A short answer', 'A list'],
+    options: ['A full draft', 'A clear plan', 'Step-by-step help', 'A short answer', 'A list'],
   };
   const fallbacks = rich
     ? [
@@ -198,9 +205,25 @@ function fallbackQuestion(turnCount, history = []) {
         {
           type: 'question',
           id: 'q4',
-          question: build ? 'What must it include?' : 'Anything to include or avoid?',
-          input: 'text',
-          placeholder: build ? 'The must-haves' : 'Type anything that matters',
+          question: build
+            ? 'For most builds, start with the main job plus one simple screen. What must it include?'
+            : 'A clear goal and a simple tone cover most cases. Anything else to lock in?',
+          input: 'choice',
+          options: build
+            ? [
+                'Main job + one simple screen',
+                'A few screens or steps',
+                'Save or remember things',
+                'Looks nice and easy',
+                'Something else',
+              ]
+            : [
+                'Keep it simple and clear',
+                'Make it short',
+                'Make it detailed',
+                'Keep it fun',
+                'Something else',
+              ],
         },
       ]
     : build
@@ -229,17 +252,29 @@ function fallbackQuestion(turnCount, history = []) {
           {
             type: 'question',
             id: 'q3',
-            question: 'What should it help someone do?',
-            input: 'text',
-            placeholder: 'Say it in plain words',
+            question: 'Most useful builds help someone finish one clear job. What should it help with?',
+            input: 'choice',
+            options: [
+              'Finish one clear job',
+              'Learn or practice something',
+              'Keep track of things',
+              'Have fun or play',
+              'Something else',
+            ],
           },
           wantBackBuild,
           {
             type: 'question',
             id: 'q5',
-            question: 'What must it include?',
-            input: 'text',
-            placeholder: 'The must-haves',
+            question: 'Start simple: one main screen and the main job. What must it include?',
+            input: 'choice',
+            options: [
+              'One main screen + the main job',
+              'A few screens or steps',
+              'Accounts or saving progress',
+              'Looks polished',
+              'Something else',
+            ],
           },
         ]
       : [
@@ -275,9 +310,15 @@ function fallbackQuestion(turnCount, history = []) {
           {
             type: 'question',
             id: 'q5',
-            question: 'Anything to include or avoid?',
-            input: 'text',
-            placeholder: 'Type anything that matters',
+            question: 'Best default is simple and clear with no fluff. Want to lock anything else?',
+            input: 'choice',
+            options: [
+              'Keep it simple and clear',
+              'Make it short',
+              'Make it detailed',
+              'Keep it fun',
+              'No extra rules',
+            ],
           },
         ];
   // First-screen category list allows 6 options (picker), even if later choice questions cap at 5.
@@ -440,8 +481,8 @@ async function nextFromModel(history, forceDone, profile) {
     instruction: forceDone || turnCount >= MAX_TURNS
       ? 'Return type done with a fully detailed final prompt. Include About me / How to talk to me from the profile. If this is build lane, write a builder brief (website/app/tool) that can go into ChatGPT, Claude, or a coding AI; allow technical detail in the deliverable; keep how you talk to the human plain.'
       : rich
-        ? 'They pasted a rough idea. Ask the next short gap-filling question, or return done if gaps are filled. If they want a website, app, or tool, use build-lane gaps. Keep questions plain.'
-        : 'Ask the next best short plain question, or return done if you have enough for a detailed prompt. If they chose a website or app, use build-lane gaps.',
+        ? 'They pasted a rough idea. Ask the next guided CHOICE question with a recommended first option, or return done if gaps are filled. Prefer opinionated picks over blank text. If they want a website, app, or tool, use build-lane gaps. Keep questions plain.'
+        : 'Ask the next guided CHOICE question with a recommended first option, or return done if you have enough. Be opinionated. Avoid fill-in-the-blank unless a unique name or title is required. If they chose a website or app, use build-lane gaps.',
   };
 
   const content = await callOpenRouter([
@@ -450,6 +491,13 @@ async function nextFromModel(history, forceDone, profile) {
   ]);
 
   let parsed = validateModelPayload(content, turnCount);
+  // Guided mode: almost never accept blank fill-ins from the model.
+  if (parsed && parsed.type === 'question' && parsed.input === 'text') {
+    const textTurns = history.filter((h) => /type |describe |write |say it|in your own|anything that matters/i.test(h.question || '')).length;
+    if (textTurns >= 1 || !/name|title|call it|what is it called/i.test(parsed.question || '')) {
+      parsed = fallbackQuestion(turnCount, history);
+    }
+  }
   if (parsed && parsed.type === 'done') {
     // Always ensure profile / non-tech speaking rules are present.
     const ensured = ensureProfileInPrompt(parsed.prompt, profile, isBuildLane(history));
