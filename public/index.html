@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#6ba8d4" />
+  <meta name="description" content="Turn what you mean into words you can use." />
+  <title>Clear Words</title>
+  <link rel="stylesheet" href="/styles.css?v=profile1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body data-phase="gate">
+  <div class="sky" aria-hidden="true">
+    <div class="sky-wash"></div>
+    <div class="cloud cloud-a"></div>
+    <div class="cloud cloud-b"></div>
+    <div class="cloud cloud-c"></div>
+    <div class="cloud cloud-d"></div>
+    <div class="sun"></div>
+  </div>
+  <canvas id="fog" class="fog" aria-hidden="true"></canvas>
+
+  <main class="app" id="app">
+    <header class="top">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span class="brand-name">Clear Words</span>
+      </div>
+      <button type="button" class="ghost" id="restartBtn" hidden>Start over</button>
+    </header>
+
+    <section class="stage" id="screen">
+      <p class="welcome" id="welcome" hidden></p>
+      <div id="content" class="focus"></div>
+    </section>
+  </main>
+
+  <script src="/fog.js?v=profile1"></script>
+  <script src="/app.js?v=profile1"></script>
+</body>
+</html>
