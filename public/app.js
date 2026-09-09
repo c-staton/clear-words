@@ -461,6 +461,46 @@
     }
   }
 
+  async function copyPlainText(text) {
+    const plain = String(text || '');
+    // Notes and other apps linkify rich HTML paste. Force text/plain only.
+    if (navigator.clipboard && window.ClipboardItem) {
+      try {
+        const item = new ClipboardItem({
+          'text/plain': new Blob([plain], { type: 'text/plain' }),
+        });
+        await navigator.clipboard.write([item]);
+        return true;
+      } catch (_) {
+        /* fall through */
+      }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(plain);
+        return true;
+      } catch (_) {
+        /* fall through */
+      }
+    }
+    const ta = document.createElement('textarea');
+    ta.value = plain;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, plain.length);
+    let ok = false;
+    try {
+      ok = document.execCommand('copy');
+    } catch (_) {
+      ok = false;
+    }
+    ta.remove();
+    return ok;
+  }
+
   function renderDone(prompt) {
     clearPickerKeys();
     setPhase('sky');
@@ -470,24 +510,19 @@
     restartBtn.hidden = false;
     welcome.hidden = true;
     content.innerHTML = `
-      <p class="done-title">Here’s what to paste</p>
-      <div class="prompt-box" id="promptText">${escapeHtml(prompt)}</div>
-      <button type="button" class="primary huge" id="copyBtn">Copy</button>
+      <p class="done-title">Here is what to paste</p>
+      <textarea class="prompt-box" id="promptText" readonly rows="12" spellcheck="false"></textarea>
+      <button type="button" class="primary huge" id="copyBtn">Copy these words</button>
       <p class="copied" id="copiedMsg"></p>`;
 
+    const box = document.getElementById('promptText');
+    box.value = prompt;
+
     document.getElementById('copyBtn').addEventListener('click', async () => {
-      const text = prompt;
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        ta.remove();
-      }
-      document.getElementById('copiedMsg').textContent = 'Copied. Paste it where you need it.';
+      const ok = await copyPlainText(prompt);
+      document.getElementById('copiedMsg').textContent = ok
+        ? 'Copied as plain text. Paste it where you need it.'
+        : 'Could not copy. Select the words above and copy.';
     });
   }
 
