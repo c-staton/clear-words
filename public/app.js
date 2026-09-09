@@ -468,8 +468,11 @@
     const state = Object.assign({ who: '', explain: '', about: '', step: 'who', editing: false }, draft || {});
     const existing = loadProfile();
     hideChromeForBeat1();
-    setPhase('gate');
+    setPhase('profile');
     restartBtn.hidden = false;
+
+    const sectionLabel = state.editing ? 'Edit my info' : 'Your info';
+    const sectionTag = `<p class="section-tag" aria-current="page">${sectionLabel}</p>`;
 
     const goBack = () => {
       if (state.editing && existing) {
@@ -494,8 +497,8 @@
 
     if (state.step === 'who' || (!state.who && state.step !== 'explain' && state.step !== 'about')) {
       state.step = 'who';
-      content.innerHTML = `${backBtn}<p class="question">Quick setup. Who is this for?</p><div id="pickerMount"></div>
-        <p class="picker-hint">One time. We save this on this device.</p>`;
+      content.innerHTML = `${backBtn}${sectionTag}<p class="question">Who is this for?</p><div id="pickerMount"></div>
+        <p class="picker-hint">Saved on this device. Separate from your words.</p>`;
       if (document.getElementById('profileBack')) document.getElementById('profileBack').onclick = goBack;
       mountPicker(content.querySelector('#pickerMount'), PROFILE_WHO, (value) => {
         renderProfileSetup(Object.assign({}, state, { who: value, step: 'explain' }));
@@ -505,7 +508,7 @@
 
     if (state.step === 'explain' || (!state.explain && state.step !== 'about')) {
       state.step = 'explain';
-      content.innerHTML = `${backBtn}<p class="question">How should answers sound?</p><div id="pickerMount"></div>`;
+      content.innerHTML = `${backBtn}${sectionTag}<p class="question">How should answers sound?</p><div id="pickerMount"></div>`;
       if (document.getElementById('profileBack')) document.getElementById('profileBack').onclick = goBack;
       mountPicker(content.querySelector('#pickerMount'), PROFILE_EXPLAIN, (value) => {
         renderProfileSetup(Object.assign({}, state, { explain: value, step: 'about' }));
@@ -516,6 +519,7 @@
     state.step = 'about';
     content.innerHTML = `
       ${backBtn}
+      ${sectionTag}
       <p class="question">Anything else to know about you?</p>
       <div class="paste-box">
         <textarea class="text-area" id="aboutAnswer" maxlength="240" rows="4"
